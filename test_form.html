@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U-2-Net Silhouette Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .upload-form {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .result img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+        .image-container {
+            flex: 1;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>U-2-Net Silhouette Extractor</h1>
+    <div class="upload-form">
+        <h2>Upload an Image</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="imageFile" name="image" accept="image/*" required>
+            <button type="submit">Extract Silhouette</button>
+        </form>
+    </div>
+    
+    <div class="result" id="result" style="display: none;">
+        <div class="image-container">
+            <h3>Original Image</h3>
+            <img id="originalImage" src="" alt="Original Image">
+        </div>
+        <div class="image-container">
+            <h3>Silhouette</h3>
+            <img id="silhouetteImage" src="" alt="Extracted Silhouette">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('imageFile');
+            
+            if (fileInput.files.length === 0) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            formData.append('image', fileInput.files[0]);
+            
+            try {
+                // Display the original image
+                const originalImage = document.getElementById('originalImage');
+                originalImage.src = URL.createObjectURL(fileInput.files[0]);
+                
+                // Send the request to the API
+                const response = await fetch('/extract-silhouette', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                // Get the response as blob
+                const blob = await response.blob();
+                
+                // Display the silhouette image
+                const silhouetteImage = document.getElementById('silhouetteImage');
+                silhouetteImage.src = URL.createObjectURL(blob);
+                
+                // Show the result section
+                document.getElementById('result').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing the image. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,1 +1,2 @@
+models/models--lilpotat--pytorch3d/snapshots/*/u2net.pth filter=lfs diff=lfs merge=lfs -text
 *.pth filter=lfs diff=lfs merge=lfs -text
